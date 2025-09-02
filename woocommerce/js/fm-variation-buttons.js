@@ -15,7 +15,7 @@
  * -----------------------------------------------------------------------------
  * HOW TO USE (SNIPPET / LEGO BLOCK STYLE)
  * -----------------------------------------------------------------------------
- * 1) Put this file in your snippets repo and import it into your main JS bundle.
+ * 1) Import/compile into your main JS bundle.
  *    Example (ESBuild/Vite/Webpack):
  *      import './path/to/fm-variation-buttons.js';
  *
