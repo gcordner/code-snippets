@@ -1,0 +1,25 @@
+| File | Purpose |
+|------|---------|
+| [plugins/fm-canelo/fm-canelo.php](https://github.com/gcordner/code-snippets/blob/main/plugins/fm-canelo/fm-canelo.php) | — |
+| [woocommerce/php/fm-woo-hide-reset-variations.php](https://github.com/gcordner/code-snippets/blob/main/woocommerce/php/fm-woo-hide-reset-variations.php) | — |
+| [woocommerce/sql/woocommerce-multi-carrier-shipping-errors.sql](https://github.com/gcordner/code-snippets/blob/main/woocommerce/sql/woocommerce-multi-carrier-shipping-errors.sql) | — |
+| [woocommerce/sql/woocommerce-products-with-no-weight.sql](https://github.com/gcordner/code-snippets/blob/main/woocommerce/sql/woocommerce-products-with-no-weight.sql) | — |
+| [woocommerce/sql/woocoomerce-order-totals-by-zipcode.sql](https://github.com/gcordner/code-snippets/blob/main/woocommerce/sql/woocoomerce-order-totals-by-zipcode.sql) | — |
+| [wordpress/acf/debug/acf-debug-display-all-fields.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/acf/debug/acf-debug-display-all-fields.php) | — |
+| [wordpress/acf/wordpress-acf-field-usage-plugin.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/acf/wordpress-acf-field-usage-plugin.php) | — |
+| [wordpress/admin/admin-bar-disable-booster.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/admin/admin-bar-disable-booster.php) | — |
+| [wordpress/admin/admin-bar-disable-woocommerce.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/admin/admin-bar-disable-woocommerce.php) | — |
+| [wordpress/admin/admin-bar-prune-keep-essentials.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/admin/admin-bar-prune-keep-essentials.php) | — |
+| [wordpress/misc/wp-config-debugging.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/misc/wp-config-debugging.php) | — |
+| [wordpress/php/fm-include-post-types-in-tag-archives.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/php/fm-include-post-types-in-tag-archives.php) | — |
+| [wordpress/php/fm-use-archive-writing-for-tag-archives.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/php/fm-use-archive-writing-for-tag-archives.php) | — |
+| [wordpress/php/wordpress-enable-shortcodes-in-widgets.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/php/wordpress-enable-shortcodes-in-widgets.php) | — |
+| [wordpress/php/wordpress-remove-archive-prefix.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/php/wordpress-remove-archive-prefix.php) | — |
+| [wordpress/sql/wordpress-autoload-size-check.sql](https://github.com/gcordner/code-snippets/blob/main/wordpress/sql/wordpress-autoload-size-check.sql) | — |
+| [wordpress/sql/wordpress-tiered-pricing-audit.sql](https://github.com/gcordner/code-snippets/blob/main/wordpress/sql/wordpress-tiered-pricing-audit.sql) | — |
+| [wordpress/themes/generatepress/generatepress-hide-post-meta-one-archives.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/themes/generatepress/generatepress-hide-post-meta-one-archives.php) | — |
+| [wordpress/themes/generatepress/generatepress-move-featured-image-archives.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/themes/generatepress/generatepress-move-featured-image-archives.php) | — |
+| [wordpress/themes/generatepress/generatepress-selective-page-title-removal.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/themes/generatepress/generatepress-selective-page-title-removal.php) | — |
+| [wordpress/themes/universal/enqueue-parent-and-child-assets.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/themes/universal/enqueue-parent-and-child-assets.php) | — |
+| [wordpress/themes/universal/wordpress-clean-archive-titles.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/themes/universal/wordpress-clean-archive-titles.php) | — |
+| [wordpress/themes/universal/wordpress-post-type-archive-body-classes.php](https://github.com/gcordner/code-snippets/blob/main/wordpress/themes/universal/wordpress-post-type-archive-body-classes.php) | — |
