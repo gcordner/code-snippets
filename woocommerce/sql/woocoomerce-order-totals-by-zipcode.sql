@@ -52,3 +52,45 @@ WHERE orders.post_type = 'shop_order'
     AND orders.post_date >= '2020-02-16'
     AND shipping_zip.meta_value IN ('92101', '92102', '92103', '92104', '92105', '92106', '92107', '92108', '92109', '92110', '92111', '92112', '92113', '92114', '92115', '92116', '92117', '92119', '92120', '92121', '92122', '92123', '92124', '92126', '92127', '92128', '92129', '92130', '92131', '92132', '92134', '92135', '92136', '92137', '92138', '92139', '92140', '92142', '92145', '92147', '92149', '92150', '92152', '92153', '92154', '92155', '92158', '92159', '92160', '92161', '92163', '92165', '92166', '92167', '92168', '92169', '92170', '92171', '92172', '92174', '92175', '92176', '92177', '92179', '92182', '92186', '92187', '92190', '92191', '92192', '92193', '92195', '92196', '92197', '92198', '92199')
     AND t.name = 'Krave Kratom';
+
+
+/*
+* For individual orders
+*/
+
+SELECT 
+    orders.ID AS order_id,
+    orders.post_date AS order_date,
+    shipping_zip.meta_value AS shipping_postcode,
+    t.name AS product_category,
+    oi.order_item_name AS product_name,
+    CAST(qty.meta_value AS UNSIGNED) AS quantity,
+    CAST(line_total.meta_value AS DECIMAL(10,2)) AS line_total
+FROM wp_woocommerce_order_items oi
+JOIN wp_posts orders 
+    ON oi.order_id = orders.ID
+JOIN wp_woocommerce_order_itemmeta product_id 
+    ON oi.order_item_id = product_id.order_item_id 
+    AND product_id.meta_key = '_product_id'
+JOIN wp_woocommerce_order_itemmeta qty 
+    ON oi.order_item_id = qty.order_item_id 
+    AND qty.meta_key = '_qty'
+JOIN wp_woocommerce_order_itemmeta line_total 
+    ON oi.order_item_id = line_total.order_item_id 
+    AND line_total.meta_key = '_line_total'
+JOIN wp_postmeta shipping_zip 
+    ON orders.ID = shipping_zip.post_id 
+    AND shipping_zip.meta_key = '_shipping_postcode'
+JOIN wp_term_relationships tr 
+    ON CAST(product_id.meta_value AS UNSIGNED) = tr.object_id
+JOIN wp_term_taxonomy tt 
+    ON tr.term_taxonomy_id = tt.term_taxonomy_id 
+    AND tt.taxonomy = 'product_cat'
+JOIN wp_terms t 
+    ON tt.term_id = t.term_id
+WHERE orders.post_type = 'shop_order'
+    AND orders.post_status IN ('wc-completed', 'wc-processing', 'wc-shipped')
+    AND orders.post_date >= '2020-01-01'
+    AND shipping_zip.meta_value IN (97201, 97202, 97203, 97204, 97205, 97206, 97207, 97208, 97209, 97210, 97211, 97212, 97213, 97214, 97220, 97221, 97215, 97216, 97217, 97218, 97219, 97222, 97223, 97227, 97228, 97229, 97231, 97232, 97233, 97236, 97256, 97258, 97266, 97268, 97269, 97280, 97290, 97291, 97292, 97293, 97224, 97225, 97230, 97238, 97239, 97240, 97242, 97267, 97281, 97282, 97283, 97286, 97294, 97296, 97298)
+    AND t.name = 'hydroxie'
+ORDER BY orders.post_date DESC;
