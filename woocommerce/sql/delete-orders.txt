@@ -1,0 +1,229 @@
+-- ------------------------------------------------------------
+-- FIRST, ORDERS (Run these one by one)
+-- ------------------------------------------------------------
+
+
+WHERE order_id IN (
+        SELECT ID FROM wp_posts
+        WHERE post_type IN (
+            'shop_order',
+            'shop_order_refund',
+            'shop_order_placeholder'
+        )
+    )
+    
+    
+
+DELETE FROM wp_woocommerce_order_itemmeta
+WHERE order_item_id IN (
+    SELECT order_item_id
+    FROM wp_woocommerce_order_items
+    WHERE order_id IN (
+    SELECT ID FROM wp_posts
+        WHERE post_type IN (
+            'shop_order',
+            'shop_order_refund',
+            'shop_order_placeholder'
+        )
+    )
+);
+
+
+
+
+
+DELETE FROM wp_woocommerce_order_items
+WHERE order_id IN (
+SELECT ID FROM wp_posts
+        WHERE post_type IN (
+            'shop_order',
+            'shop_order_refund',
+            'shop_order_placeholder'
+        )
+    );
+    
+    
+DELETE FROM wp_postmeta
+WHERE post_id IN (
+SELECT ID FROM wp_posts
+        WHERE post_type IN (
+            'shop_order',
+            'shop_order_refund',
+            'shop_order_placeholder'
+        )
+    );
+
+
+DELETE FROM wp_posts
+WHERE post_type IN (
+    'shop_order',
+    'shop_order_refund',
+    'shop_order_placeholder'
+);
+
+-- ------------------------------------------------------------
+-- NEXT, THIS (Run this as a chunk):
+-- ------------------------------------------------------------
+
+
+-- Children / related tables first
+DELETE FROM wp_wc_order_addresses;
+DELETE FROM wp_wc_order_operational_data;
+DELETE FROM wp_wc_orders_meta;
+DELETE FROM wp_wc_order_coupon_lookup;
+DELETE FROM wp_wc_order_product_lookup;
+DELETE FROM wp_wc_order_stats;
+DELETE FROM wp_wc_order_tax_lookup;
+ 
+-- Order items (HPOS version) — itemmeta first, then items
+DELETE FROM wp_woocommerce_order_itemmeta
+WHERE order_item_id IN (
+    SELECT order_item_id FROM wp_wc_order_items
+);
+DELETE FROM wp_wc_order_items;
+ 
+-- Parent HPOS orders table — last
+DELETE FROM wp_wc_orders;
+
+
+-- OR:
+
+DELETE FROM wp_wc_order_addresses;
+DELETE FROM wp_wc_order_operational_data;
+DELETE FROM wp_wc_orders_meta;
+DELETE FROM wp_wc_order_coupon_lookup;
+DELETE FROM wp_wc_order_product_lookup;
+DELETE FROM wp_wc_order_stats;
+DELETE FROM wp_wc_order_tax_lookup;
+DELETE FROM wp_wc_orders;
+
+
+THEN COUPONS (Run this as a chunk):
+
+CREATE TEMPORARY TABLE tmp_coupon_ids AS
+SELECT ID FROM wp_posts WHERE post_type = 'shop_coupon';
+ 
+-- Meta first, then the post
+DELETE FROM wp_postmeta
+WHERE post_id IN (SELECT ID FROM tmp_coupon_ids);
+ 
+DELETE FROM wp_posts
+WHERE ID IN (SELECT ID FROM tmp_coupon_ids);
+ 
+DROP TEMPORARY TABLE tmp_coupon_ids;
+
+-- ------------------------------------------------------------
+-- NEXT: USERS
+-- ------------------------------------------------------------
+
+DELETE FROM wp_usermeta
+WHERE user_id IN (
+    SELECT ID FROM (
+        SELECT ID FROM wp_users u
+        WHERE EXISTS (
+            SELECT 1 FROM wp_usermeta um
+            WHERE um.user_id = u.ID
+              AND um.meta_key = 'wp_capabilities'
+              AND (
+                  um.meta_value LIKE '%customer%'
+                  OR um.meta_value LIKE '%subscriber%'
+              )
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM wp_usermeta um2
+            WHERE um2.user_id = u.ID
+              AND um2.meta_key = 'wp_capabilities'
+              AND (
+                  um2.meta_value LIKE '%administrator%'
+                  OR um2.meta_value LIKE '%editor%'
+                  OR um2.meta_value LIKE '%author%'
+                  OR um2.meta_value LIKE '%contributor%'
+                  OR um2.meta_value LIKE '%shop_manager%'
+              )
+        )
+    ) AS customer_ids
+);
+
+DELETE FROM wp_users
+WHERE ID NOT IN (
+    SELECT user_id FROM wp_usermeta
+    WHERE meta_key = 'wp_capabilities'
+    AND (
+        meta_value LIKE '%administrator%'
+        OR meta_value LIKE '%editor%'
+        OR meta_value LIKE '%author%'
+        OR meta_value LIKE '%contributor%'
+        OR meta_value LIKE '%shop_manager%'
+    )
+);
+
+
+-- ------------------------------------------------------------
+-- 5. WOOCOMMERCE SESSIONS
+-- ------------------------------------------------------------
+ 
+DELETE FROM wp_woocommerce_sessions;
+
+
+-- ------------------------------------------------------------
+-- 6. DOWNLOADABLE PRODUCT PERMISSIONS (tied to orders/customers) -- not applicable on our site.
+-- ------------------------------------------------------------
+ 
+DELETE FROM wp_woocommerce_downloadable_product_permissions;
+
+
+-- ------------------------------------------------------------
+-- 7. ACTION SCHEDULER
+--    Removes order and email processing jobs.
+--    Uncomment the full-nuke version for a cleaner slate. (Do this for a brand new site)
+-- ------------------------------------------------------------
+ 
+-- Targeted: only order/email related hooks
+DELETE a, l
+FROM wp_actionscheduler_actions a
+LEFT JOIN wp_actionscheduler_logs l ON l.action_id = a.action_id
+WHERE a.hook IN (
+    'woocommerce_run_payment_complete_actions',
+    'woocommerce_payment_complete',
+    'woocommerce_send_transactional_email',
+    'woocommerce_new_customer_note',
+    'woocommerce_order_status_changed',
+    'woocommerce_process_queued_orders'
+);
+ 
+-- Full nuke (uncomment if you'd rather start clean):
+-- DELETE FROM wp_actionscheduler_logs;
+-- DELETE FROM wp_actionscheduler_claims;
+-- DELETE FROM wp_actionscheduler_actions;
+-- DELETE FROM wp_actionscheduler_groups;
+
+
+-- ------------------------------------------------------------
+-- 8. WOOCOMMERCE LOGS
+-- ------------------------------------------------------------
+ 
+DELETE FROM wp_woocommerce_log;
+
+
+-- ------------------------------------------------------------
+-- 9. TRANSIENTS — cart, session, shipping, reports
+-- ------------------------------------------------------------
+ 
+DELETE FROM wp_options
+WHERE option_name LIKE '_transient_wc_%'
+   OR option_name LIKE '_transient_timeout_wc_%'
+   OR option_name LIKE '_transient_woocommerce_%'
+   OR option_name LIKE '_transient_timeout_woocommerce_%'
+   OR option_name LIKE '_transient_wcpay_%'
+   OR option_name LIKE '_transient_timeout_wcpay_%'
+   OR option_name LIKE '_wc_session_%';
+ 
+
+
+OPTIMIZE TABLE wp_posts;
+OPTIMIZE TABLE wp_postmeta;
+OPTIMIZE TABLE wp_users;
+OPTIMIZE TABLE wp_usermeta;
+OPTIMIZE TABLE wp_woocommerce_order_items;
+OPTIMIZE TABLE wp_woocommerce_order_itemmeta;
+OPTIMIZE TABLE wp_options;
