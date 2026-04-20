@@ -1,0 +1,79 @@
+Problem: items can be added to a menu, but not deleted. Deletion fails on save, and the menu count sets to 0, which prevents the menu from showing 
+in the admin or on the front end. Running the wp-cli command to reset count works, and restores the menu, but the problem
+of being unable to delete persists.
+
+Solution is to delete the menu items in the database and then force the recount.
+
+But this is a band-aid and not a practical way to edit a menu.
+
+Query #1: identify the items:
+
+SELECT
+    p.ID AS menu_item_id,
+    p.post_title,
+    p.menu_order,
+    MAX(CASE WHEN pm.meta_key = '_menu_item_type' THEN pm.meta_value END) AS type,
+    MAX(CASE WHEN pm.meta_key = '_menu_item_object' THEN pm.meta_value END) AS object,
+    MAX(CASE WHEN pm.meta_key = '_menu_item_object_id' THEN pm.meta_value END) AS object_id,
+    MAX(CASE WHEN pm.meta_key = '_menu_item_url' THEN pm.meta_value END) AS url,
+    MAX(CASE WHEN pm.meta_key = '_menu_item_menu_item_parent' THEN pm.meta_value END) AS parent_id
+FROM wp_posts p
+JOIN wp_term_relationships tr
+    ON p.ID = tr.object_id
+JOIN wp_term_taxonomy tt
+    ON tr.term_taxonomy_id = tt.term_taxonomy_id
+LEFT JOIN wp_postmeta pm
+    ON p.ID = pm.post_id
+WHERE tt.taxonomy = 'nav_menu'
+  AND tt.term_id = 1189
+  AND p.post_type = 'nav_menu_item'
+GROUP BY p.ID, p.post_title, p.menu_order
+ORDER BY p.menu_order, p.ID;
+
+
+Once you have identified the problems, remove them:
+
+
+Query #2 Remove relationships from menu 1189:
+DELETE tr
+FROM wp_term_relationships tr
+JOIN wp_term_taxonomy tt
+  ON tr.term_taxonomy_id = tt.term_taxonomy_id
+WHERE tt.taxonomy = 'nav_menu'
+  AND tt.term_id = 1189
+  AND tr.object_id IN (890204, 862777, 862786);
+  
+Query #3: Remove their postmeta
+
+DELETE FROM wp_postmeta
+WHERE post_id IN (890204, 862777, 862786);
+
+Query #4: Remove the menu item posts
+
+DELETE FROM wp_posts
+WHERE ID IN (890204, 862777, 862786)
+  AND post_type = 'nav_menu_item';
+  
+
+
+WP-CLI: Run this in wp-cli to recalculate the menu count:
+
+wp eval 'wp_update_term_count_now([1189], "nav_menu");'
+
+Optional verification:
+
+SELECT
+    tt.term_id,
+    tt.count AS stored_count,
+    COUNT(tr.object_id) AS relationship_rows
+FROM wp_term_taxonomy tt
+LEFT JOIN wp_term_relationships tr
+  ON tt.term_taxonomy_id = tr.term_taxonomy_id
+WHERE tt.taxonomy = 'nav_menu'
+  AND tt.term_id = 1189
+GROUP BY tt.term_id, tt.count;
+
+
+
+
+
