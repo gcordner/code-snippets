@@ -227,3 +227,33 @@ OPTIMIZE TABLE wp_usermeta;
 OPTIMIZE TABLE wp_woocommerce_order_items;
 OPTIMIZE TABLE wp_woocommerce_order_itemmeta;
 OPTIMIZE TABLE wp_options;
+
+-- ------------------------------------------------------------
+-- 10. COMMENT META — delete commentmeta for order related comments
+-- ------------------------------------------------------------
+
+DELETE FROM wp_commentmeta 
+WHERE comment_id IN (
+    SELECT comment_ID FROM wp_comments 
+    WHERE comment_type IN ('order_note', 'webhook_delivery')
+);
+
+
+-- ------------------------------------------------------------
+-- 11. DELETE COMMENTS
+--    Might need to run this in chunks, hence the 500,000 limit.
+-- ------------------------------------------------------------
+
+DELETE FROM wp_comments 
+WHERE comment_type IN ('order_note', 'webhook_delivery')
+LIMIT 500000;
+
+
+-- ------------------------------------------------------------
+-- 12. COMMENT SANITY CHECK
+--    This should return zero.
+-- ------------------------------------------------------------
+
+DELETE cm FROM wp_commentmeta cm
+LEFT JOIN wp_comments c ON cm.comment_id = c.comment_ID
+WHERE c.comment_ID IS NULL;
