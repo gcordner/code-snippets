@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: FM Canelo
- * Plugin URI: https://example.com/fm-canelo
+ * Plugin URI: https://github.com/gcordner/code-snippets
  * Description: A WordPress plugin that displays "Viva Mexico, Cabrones!" in the WordPress admin area.
  * Version: 1.0.0
- * Author: Claude
+ * Author: Geoff Cordner
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: fm-canelo
